@@ -3,7 +3,7 @@ let timerRunning = false;
 let bestTime = localStorage.getItem("bestTime");
 let cheatFlag = false;
 
-// DOM Elements (HTMLに合わせたID)
+// DOM Elements
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
 const startButton = document.getElementById("startBtn");
@@ -16,13 +16,44 @@ const timeDisplay = document.getElementById("timer");
 const bestTimeDisplay = document.getElementById("best");
 const statusDisplay = document.getElementById("status");
 
-// 初期表示（ベストタイム）
+// ===== ランダム長文生成 =====
+function generateRandomTOS(paragraphs = 50) {
+  const words = [
+    "本契約", "利用者", "サービス", "当社", "免責", "禁止事項", "責任", "損害賠償", "準拠法",
+    "規約", "変更", "改定", "合意", "権利", "義務", "個人情報", "適用", "通知", "管轄裁判所",
+    "契約期間", "更新", "終了", "第三者", "譲渡", "利用停止", "解除", "秘密保持", "準備",
+    "定義", "条件", "遵守", "禁止", "違反", "同意", "判断", "承諾", "発効日", "有効期間",
+    "その他", "桜井祐輔", "田中圭", "永野芽衣", "中居正広"
+  ];
+
+  let html = "";
+  for (let i = 0; i < paragraphs; i++) {
+    let sentenceCount = Math.floor(Math.random() * 5) + 3; // 3〜7文
+    let paragraph = [];
+    for (let j = 0; j < sentenceCount; j++) {
+      let wordCount = Math.floor(Math.random() * 12) + 8; // 8〜20語
+      let sentence = [];
+      for (let k = 0; k < wordCount; k++) {
+        let w = words[Math.floor(Math.random() * words.length)];
+        sentence.push(w);
+      }
+      paragraph.push(sentence.join(" ") + "。");
+    }
+    html += `<p>${paragraph.join(" ")}</p>`;
+  }
+  return html;
+}
+
+// ===== 初期表示（ベストタイム） =====
 if (bestTime) {
   bestTimeDisplay.textContent = `${bestTime} 秒`;
 }
 
-// スタートボタン
+// ===== スタートボタン =====
 startButton.addEventListener("click", () => {
+  // 長文生成
+  tosContainer.innerHTML = generateRandomTOS(80);
+
   startScreen.classList.add("hidden");
   gameScreen.classList.remove("hidden");
   tosContainer.scrollTop = 0;
@@ -33,7 +64,7 @@ startButton.addEventListener("click", () => {
   startTime = performance.now();
 });
 
-// スクロール監視
+// ===== スクロール監視 =====
 tosContainer.addEventListener("scroll", () => {
   if (!timerRunning) return;
 
@@ -61,27 +92,26 @@ tosContainer.addEventListener("scroll", () => {
   }
 });
 
-// 再挑戦
+// ===== 再挑戦 =====
 retryButton.addEventListener("click", () => {
   gameScreen.classList.add("hidden");
   startScreen.classList.remove("hidden");
 });
 
-// ベストリセット
+// ===== ベストリセット =====
 resetBestButton.addEventListener("click", () => {
   localStorage.removeItem("bestTime");
   bestTime = null;
   bestTimeDisplay.textContent = "—";
 });
 
-// チート検出（ページ離脱中に計測していたらフラグ）
+// ===== チート検出 =====
 window.addEventListener("beforeunload", () => {
   if (timerRunning) {
     localStorage.setItem("cheated", "true");
   }
 });
 
-// ページロード時にチート履歴があれば警告
 window.addEventListener("load", () => {
   if (localStorage.getItem("cheated") === "true") {
     alert("途中離脱が検出されました（チート扱い）");
