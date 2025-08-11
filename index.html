@@ -1,51 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>利用規約読み飛ばしゲーム</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>利用規約スクロールゲーム</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- オープニング画面 -->
-  <section id="menuScreen" class="screen active">
+  <!-- Opening -->
+  <section id="openingScreen" class="screen active">
     <h1>📜 利用規約読み飛ばしゲーム</h1>
-    <button id="startBtnMenu">▶ スタート</button>
-    <button id="howToBtn">❓ 遊び方</button>
+    <p class="tap-message">タップしてスタート</p>
   </section>
 
-  <!-- 遊び方画面 -->
+  <!-- Menu -->
+  <section id="menuScreen" class="screen">
+    <h2>メニュー</h2>
+    <button id="startBtn" class="btn">スタート</button>
+    <button id="howToBtn" class="btn">遊び方</button>
+  </section>
+
+  <!-- How to Play -->
   <section id="howToScreen" class="screen">
     <h2>遊び方</h2>
-    <p>スタートを押すとゲーム開始！<br>
-       10秒間でどこまでスクロールできるか競います。<br>
-       指で素早く下にスワイプして、できるだけ多くの文字を読もう！（？）</p>
-    <button class="backMenuBtn">← メニューに戻る</button>
+    <p>10秒間でどれだけ利用規約をスクロールできるか挑戦！<br>
+       スクロールは指で下にスワイプして進めてね。</p>
+    <button id="backToMenuBtn" class="btn">メニューに戻る</button>
   </section>
 
-  <!-- ゲーム画面 -->
+  <!-- Game -->
   <section id="gameScreen" class="screen">
-    <div class="tos-frame" id="frame">
-      <div class="status">
-        <div class="timer">残り <span id="time">10</span>s</div>
-        <div class="result" id="result">結果: -</div>
-      </div>
-      <div class="tos-content" id="content"></div>
-    </div>
-    <div class="game-controls">
-      <button id="restartBtn" disabled>🔄 リスタート</button>
-      <button class="backMenuBtn">← メニューに戻る</button>
-    </div>
+    <div id="timer">10</div>
+    <div id="tosContent" class="tos"></div>
   </section>
 
-  <!-- 結果モーダル -->
+  <!-- Result Modal -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
-      <img src="clear.png" alt="クリア" class="clear-img" />
-      <h2>結果</h2>
-      <p id="modalResultText"></p>
-      <button id="modalBackBtn">メニューに戻る</button>
+      <img src="img/clear.png" alt="クリア" class="result-img">
+      <h3>結果</h3>
+      <p id="resultText"></p>
+      <button id="backToMenuFromResult" class="btn">メニューに戻る</button>
     </div>
   </div>
 
