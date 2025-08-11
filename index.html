@@ -3,27 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>利用規約読み飛ばしスクロールゲーム</title>
+  <title>利用規約読み飛ばしゲーム</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>利用規約読み飛ばしゲーム</h1>
-    <p class="desc">スタートしてから10秒でどこまでスクロールできるか！</p>
 
-    <div class="controls">
-      <button id="startBtn">▶ スタート</button>
-      <button id="restartBtn" disabled>🔄 リスタート</button>
-    </div>
+  <!-- オープニング画面 -->
+  <section id="menuScreen" class="screen active">
+    <h1>📜 利用規約読み飛ばしゲーム</h1>
+    <button id="startBtnMenu">▶ スタート</button>
+    <button id="howToBtn">❓ 遊び方</button>
+  </section>
 
-    <section class="tos-frame" id="frame">
+  <!-- 遊び方画面 -->
+  <section id="howToScreen" class="screen">
+    <h2>遊び方</h2>
+    <p>スタートを押すとゲーム開始！<br>
+       10秒間でどこまでスクロールできるか競います。<br>
+       指で素早く下にスワイプして、できるだけ多くの文字を読もう！（？）</p>
+    <button class="backMenuBtn">← メニューに戻る</button>
+  </section>
+
+  <!-- ゲーム画面 -->
+  <section id="gameScreen" class="screen">
+    <div class="tos-frame" id="frame">
       <div class="status">
         <div class="timer">残り <span id="time">10</span>s</div>
         <div class="result" id="result">結果: -</div>
       </div>
       <div class="tos-content" id="content"></div>
-    </section>
-  </main>
+    </div>
+    <div class="game-controls">
+      <button id="restartBtn" disabled>🔄 リスタート</button>
+      <button class="backMenuBtn">← メニューに戻る</button>
+    </div>
+  </section>
+
+  <!-- 結果モーダル -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <img src="clear.png" alt="クリア" class="clear-img" />
+      <h2>結果</h2>
+      <p id="modalResultText"></p>
+      <button id="modalBackBtn">メニューに戻る</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
