@@ -1,9 +1,22 @@
-const startBtn = document.getElementById('startBtn');
+// DOM取得
+const screens = {
+  menu: document.getElementById('menuScreen'),
+  howto: document.getElementById('howToScreen'),
+  game: document.getElementById('gameScreen')
+};
+const startBtnMenu = document.getElementById('startBtnMenu');
+const howToBtn = document.getElementById('howToBtn');
+const backMenuBtns = document.querySelectorAll('.backMenuBtn');
 const restartBtn = document.getElementById('restartBtn');
-const timeEl = document.getElementById('time');
-const resultEl = document.getElementById('result');
 const frame = document.getElementById('frame');
 const content = document.getElementById('content');
+const timeEl = document.getElementById('time');
+const resultEl = document.getElementById('result');
+
+// モーダル
+const resultModal = document.getElementById('resultModal');
+const modalResultText = document.getElementById('modalResultText');
+const modalBackBtn = document.getElementById('modalBackBtn');
 
 let gameRunning = false;
 let timerId = null;
@@ -28,11 +41,28 @@ const sectionHeaders = [
   "第9条（規約変更）","第10条（準拠法）"
 ];
 
-function generateLongTOS(targetChars = 15000) {
+// --- 画面遷移 ---
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+startBtnMenu.addEventListener('click', () => {
+  showScreen('game');
+  startGame();
+});
+howToBtn.addEventListener('click', () => showScreen('howto'));
+backMenuBtns.forEach(btn => btn.addEventListener('click', () => showScreen('menu')));
+modalBackBtn.addEventListener('click', () => {
+  resultModal.classList.remove('show');
+  showScreen('menu');
+});
+
+// --- 利用規約生成 ---
+function generateTOSChunk(chars = 2500){
   let text = "";
-  while (text.length < targetChars) {
+  while (text.length < chars) {
     text += sectionHeaders[Math.floor(Math.random()*sectionHeaders.length)] + "\n";
-    const sentences = 4 + Math.floor(Math.random() * 6);
+    const sentences = 3 + Math.floor(Math.random() * 5);
     for (let i = 0; i < sentences; i++) {
       const c = clauses[Math.floor(Math.random()*clauses.length)];
       text += "　" + c + "\n";
@@ -42,19 +72,29 @@ function generateLongTOS(targetChars = 15000) {
   return text;
 }
 
-content.textContent = generateLongTOS();
+// 初期ロード
+function loadInitialTOS(){
+  content.textContent = generateTOSChunk(4000);
+}
+loadInitialTOS();
 
+// 無限スクロール
+frame.addEventListener('scroll', () => {
+  if (frame.scrollTop + frame.clientHeight >= frame.scrollHeight - 300) {
+    content.textContent += generateTOSChunk();
+  }
+});
+
+// --- ゲーム制御 ---
 function enableScroll(enable){
   frame.style.pointerEvents = enable ? 'auto' : 'none';
 }
 
 function startGame(){
-  if (gameRunning) return;
   gameRunning = true;
   remaining = DURATION;
   timeEl.textContent = remaining;
   resultEl.textContent = "結果: -";
-  startBtn.disabled = true;
   restartBtn.disabled = true;
   frame.scrollTop = 0;
   enableScroll(true);
@@ -67,11 +107,9 @@ function startGame(){
 }
 
 function endGame(){
-  if (!gameRunning) return;
   gameRunning = false;
   clearInterval(timerId);
   enableScroll(false);
-  startBtn.disabled = false;
   restartBtn.disabled = false;
 
   const totalChars = content.textContent.length;
@@ -79,16 +117,14 @@ function endGame(){
   const ratio = Math.min(1, visibleBottom / frame.scrollHeight);
   const scrolledChars = Math.round(ratio * totalChars);
 
-  resultEl.textContent = `結果: ${scrolledChars.toLocaleString()} 文字`;
+  // モーダルで結果表示
+  modalResultText.textContent = `${scrolledChars.toLocaleString()} 文字スクロール！`;
+  resultModal.classList.add('show');
 }
 
-function restartGame(){
-  content.textContent = generateLongTOS();
+restartBtn.addEventListener('click', () => {
+  loadInitialTOS();
   frame.scrollTop = 0;
   resultEl.textContent = "結果: -";
   timeEl.textContent = DURATION;
-}
-
-startBtn.addEventListener('click', startGame);
-restartBtn.addEventListener('click', restartGame);
-enableScroll(false);
+});
