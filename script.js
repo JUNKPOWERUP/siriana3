@@ -118,3 +118,24 @@ window.addEventListener("load", () => {
     localStorage.removeItem("cheated");
   }
 });
+
+// ===== モーダル関連 =====
+const howBtn = document.getElementById("howBtn");
+const modal = document.getElementById("modal");
+const closeModalBtn = document.getElementById("closeModal");
+
+howBtn.addEventListener("click", () => {
+  modal.classList.remove("hidden");
+});
+
+closeModalBtn.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
+
+// モーダル外クリックで閉じる
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.classList.add("hidden");
+  }
+});
+
