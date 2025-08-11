@@ -1,79 +1,87 @@
-// script.js
-
 let startTime = 0;
 let timerRunning = false;
 let bestTime = localStorage.getItem("bestTime");
 let cheatFlag = false;
 
-// DOM Elements
-const startScreen = document.getElementById("start-screen");
-const gameScreen = document.getElementById("game-screen");
-const resultScreen = document.getElementById("result-screen");
-const startButton = document.getElementById("start-btn");
-const tryAgainButton = document.getElementById("try-again-btn");
-const tosContainer = document.getElementById("tos-container");
-const progressBar = document.getElementById("progress-bar");
-const timeDisplay = document.getElementById("time");
-const bestTimeDisplay = document.getElementById("best-time");
-const resultTimeDisplay = document.getElementById("result-time");
-const resultBestDisplay = document.getElementById("result-best");
+// DOM Elements (HTMLに合わせたID)
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const startButton = document.getElementById("startBtn");
+const retryButton = document.getElementById("retryBtn");
+const resetBestButton = document.getElementById("resetBest");
 
-// Show best time if available
+const tosContainer = document.getElementById("doc");
+const progressBar = document.getElementById("progress").querySelector("span");
+const timeDisplay = document.getElementById("timer");
+const bestTimeDisplay = document.getElementById("best");
+const statusDisplay = document.getElementById("status");
+
+// 初期表示（ベストタイム）
 if (bestTime) {
-  bestTimeDisplay.textContent = `ベスト: ${bestTime} 秒`;
+  bestTimeDisplay.textContent = `${bestTime} 秒`;
 }
 
-// Start game
+// スタートボタン
 startButton.addEventListener("click", () => {
-  startScreen.style.display = "none";
-  gameScreen.style.display = "block";
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
   tosContainer.scrollTop = 0;
+  timeDisplay.textContent = "0.000 s";
+  progressBar.style.width = "0%";
+  statusDisplay.textContent = "計測中...";
   timerRunning = true;
   startTime = performance.now();
 });
 
-// Scroll tracking
+// スクロール監視
 tosContainer.addEventListener("scroll", () => {
   if (!timerRunning) return;
+
   const scrollTop = tosContainer.scrollTop;
   const scrollHeight = tosContainer.scrollHeight - tosContainer.clientHeight;
   const progress = (scrollTop / scrollHeight) * 100;
   progressBar.style.width = `${progress}%`;
 
-  if (scrollTop >= scrollHeight - 5) {
-    // reached bottom
-    timerRunning = false;
-    const endTime = performance.now();
-    const elapsed = ((endTime - startTime) / 1000).toFixed(2);
-    resultTimeDisplay.textContent = `${elapsed} 秒`;
+  // タイム更新
+  const now = performance.now();
+  const elapsed = ((now - startTime) / 1000).toFixed(3);
+  timeDisplay.textContent = `${elapsed} s`;
 
+  // 一番下に到達
+  if (scrollTop >= scrollHeight - 5) {
+    timerRunning = false;
+    statusDisplay.textContent = "ゴール！";
+
+    // ベストタイム更新
     if (!bestTime || parseFloat(elapsed) < parseFloat(bestTime)) {
       bestTime = elapsed;
       localStorage.setItem("bestTime", bestTime);
     }
-    resultBestDisplay.textContent = `ベスト: ${bestTime} 秒`;
-
-    gameScreen.style.display = "none";
-    resultScreen.style.display = "block";
+    bestTimeDisplay.textContent = `${bestTime} 秒`;
   }
 });
 
-// Try again
-tryAgainButton.addEventListener("click", () => {
-  resultScreen.style.display = "none";
-  startScreen.style.display = "block";
-  bestTimeDisplay.textContent = bestTime
-    ? `ベスト: ${bestTime} 秒`
-    : "";
+// 再挑戦
+retryButton.addEventListener("click", () => {
+  gameScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
 });
 
-// Cheat detection
-window.addEventListener("beforeunload", (e) => {
+// ベストリセット
+resetBestButton.addEventListener("click", () => {
+  localStorage.removeItem("bestTime");
+  bestTime = null;
+  bestTimeDisplay.textContent = "—";
+});
+
+// チート検出（ページ離脱中に計測していたらフラグ）
+window.addEventListener("beforeunload", () => {
   if (timerRunning) {
     localStorage.setItem("cheated", "true");
   }
 });
 
+// ページロード時にチート履歴があれば警告
 window.addEventListener("load", () => {
   if (localStorage.getItem("cheated") === "true") {
     alert("途中離脱が検出されました（チート扱い）");
