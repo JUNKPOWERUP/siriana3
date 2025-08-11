@@ -57,3 +57,7 @@ body{background:linear-gradient(180deg,#f8fafc,var(--bg));color:#111}
   .doc{max-height:48vh}
   .progressWrap{width:140px}
 }
+.modal.hidden {
+  display: none !important;
+}
+
