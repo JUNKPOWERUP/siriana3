@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>利用規約飛ばしゲーム（モダンUI）</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="長い利用規約を下までスクロールする速さを競うゲーム（ローカル保存のみ）">
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- スタート画面 -->
+    <section id="startScreen" class="card center">
+      <div class="brand">TOS Rush</div>
+      <h1 class="title">利用規約飛ばしゲーム</h1>
+      <p class="lead">ダミーの長文規約を上から下までスクロールして、到達時間を競おう。<br>※実際の契約や同意を促す用途には使わないでください。</p>
+      <div class="controls">
+        <button id="startBtn" class="btn primary">スタート</button>
+        <button id="howBtn" class="btn ghost">遊び方</button>
+      </div>
+      <div class="meta small">ベストタイムはこの端末に保存されます（オンライン機能なし）</div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <main id="gameScreen" class="hidden">
+      <header class="topbar">
+        <div class="top-left">
+          <button id="backBtn" class="icon ghost" title="戻る">←</button>
+          <div class="hud">
+            <div class="timer" id="timer">0.000 s</div>
+            <div class="progressWrap">
+              <div class="progress" id="progress"><span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="top-right small" id="status">準備中</div>
+      </header>
+
+      <section class="content-area">
+        <aside class="side card small">
+          <div class="section-title">ルール</div>
+          <ol>
+            <li>スタートを押したら上から開始します。</li>
+            <li>最下部に到達した瞬間の時間を競います。</li>
+            <li>ページ切替や離脱はチートと見なします。</li>
+          </ol>
+
+          <div class="section-title">自己ベスト</div>
+          <div id="best" class="best">—</div>
+
+          <div style="margin-top:12px">
+            <button id="retryBtn" class="btn secondary full">再挑戦</button>
+            <button id="resetBest" class="btn ghost full">ベストを消去</button>
+          </div>
+        </aside>
+
+        <article class="doc card" id="doc" tabindex="0" aria-label="規約本文">
+          <!-- 長文は script.js で注入 -->
+        </article>
+      </section>
+
+      <footer class="foot small">
+        <div>ヒント: ホイールやタッチでスクロール。速く下まで行こう！</div>
+        <div>チート検出: 急なジャンプ / タブ切替 / Home/End 等は警告</div>
+      </footer>
+    </main>
+
+    <!-- モーダル / 情報 -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-card">
+        <h3 id="modalTitle">遊び方</h3>
+        <div id="modalBody" class="small">スタートを押して下までスクロール。途中でタブを離れたり、ページをリロードするとチート判定になります。ベストタイムはローカルに保存されます。</div>
+        <div style="margin-top:12px;text-align:right">
+          <button id="closeModal" class="btn primary small">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
