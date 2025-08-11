@@ -8,42 +8,25 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;padding:0;font-family:sans-serif;background:#08172a;color:var(--text)}
 
-.container{
-  max-width:600px;
-  margin:auto;
-  padding:16px;
-}
+/* 各画面 */
+.screen{display:none; padding:20px; text-align:center;}
+.screen.active{display:block}
 
-h1{
-  font-size:1.4rem;
-  margin:0 0 4px 0;
-  text-align:center;
-}
-.desc{
-  text-align:center;
-  color:var(--muted);
-  margin:0 0 10px 0;
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-bottom:8px;
-}
 button{
-  flex:1;
-  min-width:120px;
-  padding:12px;
-  font-size:1rem;
-  border:none;
-  border-radius:8px;
   background:var(--accent);
   color:#042029;
+  border:none;
+  padding:12px 20px;
+  font-size:1rem;
+  border-radius:8px;
   font-weight:700;
+  margin:6px;
 }
 button:disabled{opacity:0.5}
 
+h1,h2{margin-top:0}
+
+/* ゲーム画面 */
 .tos-frame{
   height:70vh;
   overflow:auto;
@@ -80,8 +63,34 @@ button:disabled{opacity:0.5}
   padding:10px;
 }
 
-@media (max-width:480px){
-  h1{font-size:1.2rem}
-  .desc{font-size:0.9rem}
-  button{font-size:0.95rem;padding:10px}
+.game-controls{
+  margin-top:10px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* モーダル */
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+.modal.show{display:flex}
+.modal-content{
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:8px;
+  text-align:center;
+  max-width:90%;
+}
+.clear-img{
+  width:80px; height:auto;
+  margin-bottom:10px;
 }
