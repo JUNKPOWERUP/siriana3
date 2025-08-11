@@ -1,141 +1,94 @@
-let startTime = 0;
-let timerRunning = false;
-let bestTime = localStorage.getItem("bestTime");
-let cheatFlag = false;
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const timeEl = document.getElementById('time');
+const resultEl = document.getElementById('result');
+const frame = document.getElementById('frame');
+const content = document.getElementById('content');
 
-// DOM Elements
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-const startButton = document.getElementById("startBtn");
-const retryButton = document.getElementById("retryBtn");
-const resetBestButton = document.getElementById("resetBest");
+let gameRunning = false;
+let timerId = null;
+let remaining = 10;
+const DURATION = 10;
 
-const tosContainer = document.getElementById("doc");
-const progressBar = document.getElementById("progress").querySelector("span");
-const timeDisplay = document.getElementById("timer");
-const bestTimeDisplay = document.getElementById("best");
-const statusDisplay = document.getElementById("status");
+const clauses = [
+  "本サービスは、提供する機能及び付随するサービスを利用者に提供します。",
+  "利用者は本規約に従い、当社の定める方法で利用するものとします。",
+  "当社は予告なく本サービスの全部または一部を変更・停止できます。",
+  "利用者は自己責任で利用し、損害について自身で対処するものとします。",
+  "当社は利用者間のトラブルに介入しませんが、法令に基づく要請があれば協力します。",
+  "本サービス内の権利は、当社または権利者に帰属します。",
+  "利用者は事前承諾なく商業利用してはなりません。",
+  "登録情報は適切に管理しますが、安全性を保証するものではありません。",
+  "本規約にない事項は当社の定めによります。",
+  "紛争は東京地方裁判所を第一審専属管轄とします。"
+];
+const sectionHeaders = [
+  "第1条（適用）","第2条（定義）","第3条（サービス提供）","第4条（利用者の責務）",
+  "第5条（禁止事項）","第6条（知的財産権）","第7条（免責）","第8条（個人情報）",
+  "第9条（規約変更）","第10条（準拠法）"
+];
 
-// ===== ランダム長文生成 =====
-function generateRandomTOS(paragraphs = 50) {
-  const words = [
-    "本契約", "利用者", "サービス", "当社", "免責", "禁止事項", "責任", "損害賠償", "準拠法",
-    "規約", "変更", "改定", "合意", "権利", "義務", "個人情報", "適用", "通知", "管轄裁判所",
-    "契約期間", "更新", "終了", "第三者", "譲渡", "利用停止", "解除", "秘密保持", "準備",
-    "定義", "条件", "遵守", "禁止", "違反", "同意", "判断", "承諾", "発効日", "有効期間",
-    "その他", "桜井祐輔", "田中圭", "永野芽衣", "中居正広"
-  ];
-
-  let html = "";
-  for (let i = 0; i < paragraphs; i++) {
-    let sentenceCount = Math.floor(Math.random() * 5) + 3; // 3〜7文
-    let paragraph = [];
-    for (let j = 0; j < sentenceCount; j++) {
-      let wordCount = Math.floor(Math.random() * 12) + 8; // 8〜20語
-      let sentence = [];
-      for (let k = 0; k < wordCount; k++) {
-        let w = words[Math.floor(Math.random() * words.length)];
-        sentence.push(w);
-      }
-      paragraph.push(sentence.join(" ") + "。");
+function generateLongTOS(targetChars = 15000) {
+  let text = "";
+  while (text.length < targetChars) {
+    text += sectionHeaders[Math.floor(Math.random()*sectionHeaders.length)] + "\n";
+    const sentences = 4 + Math.floor(Math.random() * 6);
+    for (let i = 0; i < sentences; i++) {
+      const c = clauses[Math.floor(Math.random()*clauses.length)];
+      text += "　" + c + "\n";
     }
-    html += `<p>${paragraph.join(" ")}</p>`;
+    text += "\n";
   }
-  return html;
+  return text;
 }
 
-// ===== 初期表示（ベストタイム） =====
-if (bestTime) {
-  bestTimeDisplay.textContent = `${bestTime} 秒`;
+content.textContent = generateLongTOS();
+
+function enableScroll(enable){
+  frame.style.pointerEvents = enable ? 'auto' : 'none';
 }
 
-// ===== スタートボタン =====
-startButton.addEventListener("click", () => {
-  // 長文生成
-  tosContainer.innerHTML = generateRandomTOS(80);
+function startGame(){
+  if (gameRunning) return;
+  gameRunning = true;
+  remaining = DURATION;
+  timeEl.textContent = remaining;
+  resultEl.textContent = "結果: -";
+  startBtn.disabled = true;
+  restartBtn.disabled = true;
+  frame.scrollTop = 0;
+  enableScroll(true);
 
-  startScreen.classList.add("hidden");
-  gameScreen.classList.remove("hidden");
-  tosContainer.scrollTop = 0;
-  timeDisplay.textContent = "0.000 s";
-  progressBar.style.width = "0%";
-  statusDisplay.textContent = "計測中...";
-  timerRunning = true;
-  startTime = performance.now();
-});
+  timerId = setInterval(() => {
+    remaining--;
+    timeEl.textContent = remaining;
+    if (remaining <= 0) endGame();
+  }, 1000);
+}
 
-// ===== スクロール監視 =====
-tosContainer.addEventListener("scroll", () => {
-  if (!timerRunning) return;
+function endGame(){
+  if (!gameRunning) return;
+  gameRunning = false;
+  clearInterval(timerId);
+  enableScroll(false);
+  startBtn.disabled = false;
+  restartBtn.disabled = false;
 
-  const scrollTop = tosContainer.scrollTop;
-  const scrollHeight = tosContainer.scrollHeight - tosContainer.clientHeight;
-  const progress = (scrollTop / scrollHeight) * 100;
-  progressBar.style.width = `${progress}%`;
+  const totalChars = content.textContent.length;
+  const visibleBottom = frame.scrollTop + frame.clientHeight;
+  const ratio = Math.min(1, visibleBottom / frame.scrollHeight);
+  const scrolledChars = Math.round(ratio * totalChars);
 
-  // タイム更新
-  const now = performance.now();
-  const elapsed = ((now - startTime) / 1000).toFixed(3);
-  timeDisplay.textContent = `${elapsed} s`;
+  resultEl.textContent = `結果: ${scrolledChars.toLocaleString()} 文字`;
+}
 
-  // 一番下に到達
-  if (scrollTop >= scrollHeight - 5) {
-    timerRunning = false;
-    statusDisplay.textContent = "ゴール！";
+function restartGame(){
+  content.textContent = generateLongTOS();
+  frame.scrollTop = 0;
+  resultEl.textContent = "結果: -";
+  timeEl.textContent = DURATION;
+}
 
-    // ベストタイム更新
-    if (!bestTime || parseFloat(elapsed) < parseFloat(bestTime)) {
-      bestTime = elapsed;
-      localStorage.setItem("bestTime", bestTime);
-    }
-    bestTimeDisplay.textContent = `${bestTime} 秒`;
-  }
-});
-
-// ===== 再挑戦 =====
-retryButton.addEventListener("click", () => {
-  gameScreen.classList.add("hidden");
-  startScreen.classList.remove("hidden");
-});
-
-// ===== ベストリセット =====
-resetBestButton.addEventListener("click", () => {
-  localStorage.removeItem("bestTime");
-  bestTime = null;
-  bestTimeDisplay.textContent = "—";
-});
-
-// ===== チート検出 =====
-window.addEventListener("beforeunload", () => {
-  if (timerRunning) {
-    localStorage.setItem("cheated", "true");
-  }
-});
-
-window.addEventListener("load", () => {
-  if (localStorage.getItem("cheated") === "true") {
-    alert("途中離脱が検出されました（チート扱い）");
-    localStorage.removeItem("cheated");
-  }
-});
-
-// ===== モーダル関連 =====
-const howBtn = document.getElementById("howBtn");
-const modal = document.getElementById("modal");
-const closeModalBtn = document.getElementById("closeModal");
-
-howBtn.addEventListener("click", () => {
-  modal.classList.remove("hidden");
-});
-
-closeModalBtn.addEventListener("click", () => {
-  modal.classList.add("hidden");
-});
-
-// モーダル外クリックで閉じる
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.classList.add("hidden");
-  }
-});
-
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', restartGame);
+enableScroll(false);
