@@ -44,25 +44,32 @@ button{
 }
 button:disabled{opacity:0.5}
 
-.status{
-  display:flex;
-  justify-content:space-around;
-  font-size:1.1rem;
-  margin-bottom:8px;
-}
-
-.timer{
-  font-weight:700;
-  font-size:1.2rem;
-}
-
 .tos-frame{
   height:70vh;
   overflow:auto;
   border-radius:8px;
   background:#0b1220;
-  padding:14px;
   border:1px solid rgba(255,255,255,0.08);
+  position:relative;
+}
+
+.status{
+  position:sticky;
+  top:0;
+  background:rgba(11,18,32,0.95);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 10px;
+  font-size:1.1rem;
+  z-index:5;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.timer{
+  font-weight:700;
+  font-size:1.2rem;
+  color:var(--accent);
 }
 
 .tos-content{
@@ -70,6 +77,7 @@ button:disabled{opacity:0.5}
   line-height:1.8;
   color:var(--muted);
   white-space:pre-wrap;
+  padding:10px;
 }
 
 @media (max-width:480px){
